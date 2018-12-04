@@ -26,7 +26,7 @@ class Downloader():
             self.url, headers={
                 'Range': 'bytes={start}-{end}'.format(start=start, end=end),
             }
-        )
+        ).content
 
     def _download_in_chunks(self, chunk_count=8):
         chunk_size = int(self.file_size / chunk_count)
@@ -39,11 +39,11 @@ class Downloader():
         data_chunks = {}
         for future in as_completed(future_map):
             start = future_map[future]
-            data_chunks[start] = future.result().text
+            data_chunks[start] = future.result()
         return data_chunks
 
     def _build_file_from_chunks(self, chunks, chunk_count=8):
-        return ''.join([
+        return b''.join([
             chunks[start] for start in range(
                 0, self.file_size, int(self.file_size / chunk_count)
             )
