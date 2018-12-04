@@ -1,3 +1,4 @@
+import click
 import requests
 
 from concurrent.futures import as_completed, ThreadPoolExecutor
@@ -55,3 +56,21 @@ class Downloader():
                 self._download_in_chunks(chunk_count=chunk_count)
             )
         return requests.get(self.url).text
+
+
+@click.command()
+@click.option('--url')
+@click.option('--filename', help='Filename')
+@click.option(
+    '--chunks', default=8,
+    help='In how many parallel chunks to download the file.'
+)
+def download(url, filename, chunks):
+    dl = Downloader(url)
+    data = dl.download(chunk_count=8)
+    with open(filename, 'wb') as f:
+        f.write(data)
+
+
+if __name__ == '__main__':
+    download()
